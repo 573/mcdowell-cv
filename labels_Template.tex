@@ -1,0 +1,67 @@
+\documentclass[a4paper,landscape,20pt,german]{extarticle} % letterpaper: umrechnen
+\usepackage[a4paper,total={6in, 8in},landscape]{geometry} % add. option margin=1in deleted
+\usepackage[utf8]{inputenc}
+\usepackage{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[newdimens]{labels}
+\usepackage{showframe}
+\renewcommand{\familydefault}{\sfdefault}
+\LabelCols=5
+\LabelRows=10
+%\LeftBorder=5mm%
+%\RightBorder=5mm
+%\TopBorder=0.5mm
+%\BottomBorder=0.5mm
+\LeftPageMargin=0mm % Bsp. Schäfershop & Falken
+%\LeftPageMargin=7mm % Bsp. Printus
+\RightPageMargin=0mm % Bsp. Schäfershop & Falken
+%\RightPageMargin=0mm % Bsp. Printus
+\TopPageMargin=0mm % Bsp. Schäfershop & Falken
+%\TopPageMargin=11mm % Bsp. Printus
+\BottomPageMargin=7mm % Bsp. Schäfershop & Falken
+%\BottomPageMargin=19mm % Bsp. Printus
+\InterLabelColumn=0mm%% Gap between columns
+\InterLabelRow=0mm%% Gap between rows
+\LeftLabelBorder=0.2em
+\RightLabelBorder=0.2em
+\TopLabelBorder=0pt
+\BottomLabelBorder=0pt
+\LabelInfotrue
+\LabelGridtrue
+\LabelSetup
+
+\newcommand{\Etikett}[1]{%
+%\addresslabel{#1\\ #2\\ #3\\ {\bfseries #4}}%
+\addresslabel{#1}%
+}
+\begin{document}
+% TODO
+%\input{./data}
+\Etikett{}
+\Etikett{}
+\Etikett{}
+\Etikett{}
+\Etikett{}
+\Etikett{}
+\Etikett{}
+\Etikett{}
+\Etikett{}
+\Etikett{}
+\Etikett{}
+\Etikett{{\tiny subtitle\par}cat}
+\Etikett{{\tiny subtitle\par}cat}
+\Etikett{{\tiny subtitle\par}cat}
+\Etikett{{\tiny subtitle\par}cat}
+
+%\Etikett{}
+%\Etikett{}
+%\Etikett{}
+%\Etikett{}
+%\Etikett{}
+
+Im Druckerdialog, Landscape, A4 und als Ränder je 0mm wählen (qpdfview) und nicht \emph{Fit to Page}
+\end{document}
+
+
+

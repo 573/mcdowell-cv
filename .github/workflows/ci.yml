@@ -1,0 +1,149 @@
+name: Build and test flake outputs
+on:
+  push:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      branch:
+        description: Branch name to build on
+        default: ""
+        required: false
+        type: string
+    secrets:
+      CACHIX_ACTIVATE_TOKEN:
+      CACHIX_AUTH_TOKEN:
+        required: true
+
+jobs:
+  nix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        system:
+          - aarch64
+          - x86_64
+        include:
+          - nix-command: --print-build-logs build .#
+            system: aarch64
+            deploy-agent: sams9
+
+          - nix-command: --print-build-logs build .# 
+            system: x86_64
+            deploy-agent: DANIELKNB1
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        continue-on-error: true
+        with:
+          tool-cache: true
+
+      - name: Install qemu-user-static (aarch64)
+        if: matrix.system == 'aarch64'
+        env:
+          _system: ${{ matrix.system }}-linux
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-user-static
+
+      - name: Install nix (x86_64)
+        if: matrix.system == 'x86_64'
+        env:
+          _system: ${{ matrix.system }}-linux
+        uses: nixbuild/nix-quick-install-action@v25
+        with:
+          nix_conf: |
+            substituters = https://cache.nixos.org/ https://nix-community.cachix.org
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            keep-going = true
+            show-trace = true
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+            keep-outputs = true
+
+      - name: Install nix (aarch64)
+        if: matrix.system == 'aarch64'
+        env:
+          _system: ${{ matrix.system }}-linux
+        uses: nixbuild/nix-quick-install-action@v25
+        with:
+          nix_conf: |
+            substituters = https://cache.nixos.org/ https://nix-community.cachix.org
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            keep-going = true
+            show-trace = true
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+            keep-outputs = true
+            system = aarch64-linux # enables binfmt on that machine, see https://nixos.wiki/wiki/NixOS_on_ARM#Compiling_through_binfmt_QEMU
+
+      - name: Restore and cache Nix store
+        env:
+          _system: ${{ matrix.system }}-linux
+        uses: nix-community/cache-nix-action@v2
+        with:
+          gc-enabled-linux: true
+          gc-max-store-size-linux: 13000000000
+          gc-enabled-macos: true
+          gc-max-store-size-macos: 13000000000
+          purge-enabled: true
+          purge-max-age: 86400
+          purge-by-created-time: true
+          purge-by-accessed-time: true
+          # output debug info
+          debug: true
+          # save a new cache every time ci file changes
+          key: cache-ubuntu-latest-${{ hashFiles('.github/workflows/ci.yml') }}
+          restore-keys: |
+            cache-ubuntu-latest-
+
+      # Uncomment to debug this job
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+
+      - name: Setup cachix
+        env:
+          _system: ${{ matrix.system }}-linux
+        uses: cachix/cachix-action@v12
+        with:
+          name: 573-bc
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build command
+        env:
+          _system: ${{ matrix.system }}-linux
+        run: |
+            cachix use gerschtli
+            cachix use nix-on-droid
+            cachix use 573-bc
+            cachix use nix-community
+            cachix use coq
+            cachix use nixpkgs-ruby
+            cachix use arm
+
+            echo "::group::Build command"
+            cachix watch-exec 573-bc \
+            nix -- ${{ matrix.nix-command }}
+            echo "outPaths=$(nix ${{ matrix.nix-command }} --print-out-paths)" >> $GITHUB_ENV
+
+      - name: Upload PDF
+        env:
+          _system: ${{ matrix.system }}-linux
+        uses: actions/upload-artifact@v3
+        with:
+          name: Generated Pdf of CV (${{ env._system }})
+          path: ${{ env.outPaths }}/*.pdf
+
+      - name: Push
+        env:
+          _system: ${{ matrix.system }}-linux
+        run: |
+          spec=${{ env.outPaths }}
+          cachix push 573-bc $spec
+
+# vim: set sw=2:
