@@ -24,11 +24,6 @@
 
 % Set up the fonts according to options
 \def\mainfontsize{11pt}
-\def\mainfontface{Times New Roman}
-
-\DeclareOption{calibri}{%
-  \def\mainfontface{Calibri}
-}
 
 % Set up papersize according to options, default to US letter
 \def\papersize{letterpaper}
@@ -53,9 +48,17 @@
 \usepackage[left=0.75in,top=0.6in,right=0.75in,bottom=0.6in]{geometry}
 
 % Set font face
-\usepackage{fontspec}
-\setmainfont[SmallCapsFeatures={Renderer=Basic},
-Ligatures={TeX, NoCommon, NoDiscretionary}]{\mainfontface}
+\usepackage{fontspec} % see https://tex.stackexchange.com/q/352804/46261 and https://tex.stackexchange.com/q/311446/46261
+\setsansfont[Extension=.ttf,
+Scale=MatchLowercase,
+SmallCapsFeatures={Renderer=Basic},
+Ligatures={TeX, NoCommon, NoDiscretionary}]{Carlito-Regular}
+\setmainfont[Extension=.ttf,
+UprightFont=*-Regular,
+BoldFont=*-Bold,
+ItalicFont=*-Italic,
+BoldItalicFont=*-BoldItalic,
+Ligatures={TeX, NoCommon, NoDiscretionary}]{Caladea}
 
 % Remove paragraph indentation
 \usepackage[parfill]{parskip}

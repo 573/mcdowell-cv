@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+cp $(nix build --no-link --print-out-paths)/* .
