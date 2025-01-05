@@ -126,3 +126,13 @@ sympy-plots-for-*.tex/
 # WinEdt
 *.bak
 *.sav
+
+# result folders
+result
+result-*
+
+# .github/* changes only explicitly i. e. the workflow
+.*/
+
+# the data.tex file for the labels
+data.tex

@@ -1,0 +1,19 @@
+\documentclass[german,plain]{famcal}
+
+\begin{document}
+
+% some learning resources:
+% https://latexdraw.com/draw-a-rectangle-in-tikz/
+% https://tikz.dev/tikz-pics
+% https://tex.stackexchange.com/questions/39037/tikz-use-opacity-for-fill-yet-leave-draw-lines-untouched
+% https://tex.stackexchange.com/questions/119309/arguments-of-tikzset-inside-a-beamer-document
+% https://tex.stackexchange.com/questions/192907/how-do-i-draw-shapes-inside-a-tikz-node
+% https://tex.stackexchange.com/questions/356224/tikz-calendar-loop-through-array-of-dates-to-mark-vacations
+
+\def\vacation{\node[rectangle,draw=yellow!30,fill = yellow!30,minimum width = 2cm, minimum height = 1cm] (r) at (0,0) {};}
+\makeFamCal{2025}{\quad, \quad, \quad, \quad, \quad}{
+	if (between=2025-01-30 and 2025-01-31) {\vacation}
+	if (between=2025-03-27 and 2025-04-11) {\vacation}
+}
+ 
+\end{document}
